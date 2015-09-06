@@ -1,1 +1,67 @@
 //test
+import java.io.*;
+import java.util.*;
+public class KursInput{
+  String fileName;
+  
+  public static void main(String[]args){//Main
+    //Erstellt ein Objekt mit dem Namen der Datei (=Kursbelegung)
+    KursInput object = new KursInput("Kursbelegung");  
+    object.textEingabe();
+  }
+  
+  public KursInput(String fileName){//Konstuktor für den Dateinamen
+    this.fileName = fileName;
+  }
+  
+  /**
+  * Liest Zeilen von der Konsole und gibt sie auf Datei aus:
+  */
+  public void textEingabe(){
+    //legt einen Scanner an, der die Konsoleneingabe auslesen kann
+    Scanner sc;
+    //legt einen FileWriter an, der in Textdateien schreiben kann
+    FileWriter fw;
+    try {
+      sc = new Scanner(System.in);
+      fw = new FileWriter(fileName);
+      
+      // Textzeilen von Konsole einlesen und auf Datei schreiben:
+      String zeile;
+      boolean fertig=false;
+      
+      //Eingabe der Stufe wie zum Beispiel Q1
+      System.out.println("Stufe eingeben (z.B. 7a oder Q1)");
+      zeile = sc.nextLine();
+      fw.write(zeile+"\r\n");       // Ausgabe auf Datei
+      
+      while (!fertig) {//Eingabe der Kurse bis "@end" geschrieben wird
+        fertig = zeile.startsWith("@end");
+        
+        System.out.println("Kurs eingeben (z.B. SW G1 oder F6 L2");
+        zeile = sc.nextLine();
+        
+        if(zeile.equals("\\w(\\w|\\d)?\\s?[GL][1-9]")){//Schreibt den Kurs in die Datei wenn die Eingabe dem gewünschten Format entspricht
+          fw.write(zeile+"\r\n");       // Ausgabe auf Datei
+        }
+        
+        else if(zeile.equals("@end")){//Beendet die Datei wenn @end eingegeben wird
+          fertig=!fertig;
+        }
+        
+        else{//Gibt eine Fehlermeldung aus wenn die Eingabe ungültig ist
+          System.out.println("Fehlerhafte Eingabe");
+        }
+      }
+      
+      
+      //Datei wird geschlossen
+      System.out.println("--Ende-- Datei wird geschlossen: "+fileName);
+      fw.close();
+    }
+    catch (IOException e){//Fehlermeldung wenn z.B. die Datei nicht existiert etc.
+      System.out.println("Fehler beim Schreiben der Datei " + fileName);
+      System.out.println(e.toString());
+    }
+  }
+}
