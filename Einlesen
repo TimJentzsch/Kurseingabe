@@ -1,64 +1,77 @@
 import java.io.*;
 import java.util.*;
-public class KursInput{
+public class KursEingabe{                                                                     //Speichert die Kursbelegungen in einer Datei ab. Mit [I] Makierte Sachen sind aus dem Internet kopiert.
   String fileName;
   
-  public static void main(String[]args){//Main
-    //Erstellt ein Objekt mit dem Namen der Datei (=Kursbelegung)
-    KursInput object = new KursInput("Kursbelegung");  
+  public static void main(String[]args){                                                      //Main
+    KursEingabe object = new KursEingabe("KursInput");                                        //[I] Name der Textdatei wird festgelegt: "KursInput" 
     object.textEingabe();
   }
   
-  public KursInput(String fileName){//Konstuktor für den Dateinamen
+  public KursEingabe(String fileName){                                                        //Konstruktor
     this.fileName = fileName;
   }
   
-  /**
-  * Liest Zeilen von der Konsole und gibt sie auf Datei aus:
-  */
   public void textEingabe(){
-    //legt einen Scanner an, der die Konsoleneingabe auslesen kann
-    Scanner sc;
-    //legt einen FileWriter an, der in Textdateien schreiben kann
-    FileWriter fw;
+    Scanner sc;                                                                               //Ein Scanner liest die Konsoleneingabe
+    FileWriter fw;                                                                            //[I] Ein FileWriter schreibt in eine Textdatei
+    String regAusdruck2="";                                                                          
     try {
-      sc = new Scanner(System.in);
-      fw = new FileWriter(fileName);
+      sc = new Scanner(System.in);                                                            //Der Scanner wird deklariert
+      fw = new FileWriter(fileName);                                                          //[I] Der FileWriter wird in die Datei "KursInput" schreiben
       
-      // Textzeilen von Konsole einlesen und auf Datei schreiben:
-      String zeile;
+      String zeile="";                                                                        //Im String "zeile" wird die Konsoleneingabe eingespeichert
       boolean fertig=false;
+      boolean richtig=false;
       
-      //Eingabe der Stufe wie zum Beispiel Q1
-      System.out.println("Stufe eingeben (z.B. 7a oder Q1)");
-      zeile = sc.nextLine();
-      fw.write(zeile+"\r\n");       // Ausgabe auf Datei
+      while(!richtig) {                                                                       //Stufe muss eingegeben werden, läuft solange, bis eine richtige Eingabe erfolgt
+        String regAusdruck1="([5-9]//W)|([Q][1-2])|(EF)";                                     //Regulärer Ausdruck für die Stufe
+        System.out.println("Stufe eingeben (z.B. 7a oder Q1)");
+        zeile = sc.nextLine();                                                                //Fordert zur Eingabe auf und speichert diese in zeile ein
+        if(zeile.matches(regAusdruck1)){                                                      //Überprüft, ob die eingabe mit dem regulärem Ausdruck übereinstimmt
+          fw.write(zeile+"\r\n");                                                             //[I] Schreibt die Stufe in die Datei und geht danach in die nächste Zeile
+          richtig=true;                                                                       //Geht aus der Schleife raus
+        }
+        else{                                                                                 //Fehlerausgabe bei fehlerhafter Eingabe
+          System.out.println("Fehlerhafte Eingabe.");
+        }
+      } // end of while
       
-      while (!fertig) {//Eingabe der Kurse bis "@end" geschrieben wird
-        fertig = zeile.startsWith("@end");
+      if (zeile=="EF"||zeile=="Q1"||zeile=="Q2") {
+        regAusdruck2="((\\w(\\w|\\d)?//s[GL][1-9]))|((PX)\\w\\w(\\w|\\d))";            //Regulärer Ausdruck für die Kursbelegung für die Oberstufe
+      } // end of if
+      
+      else {
+        regAusdruck2="(\\w(\\w(\\w)?|\\d)?)";                                          //Regulärer Ausdruck für die Kursbelegung für die Unterstufe
+      } // end of if
+      
+      while (!fertig) {
+        fertig = zeile.startsWith("@end");                                                    //Legt fest, mit welchem Ausdruck die Schleife beendet wird (hier "@end")
         
-        System.out.println("Kurs eingeben (z.B. SW G1 oder F6 L2");
-        zeile = sc.nextLine();
+        System.out.println("Kurs eingeben (z.B. SW G1 oder F6 L2, bzw. M oder L6 für die Unterstufe)");
+        zeile = sc.nextLine();                                                                //Speichert die Kursbelegung in zeile ein
         
-        if(zeile.equals("\\w(\\w|\\d)?\\s?[GL][1-9]")){//Schreibt den Kurs in die Datei wenn die Eingabe dem gewünschten Format entspricht
-          fw.write(zeile+"\r\n");       // Ausgabe auf Datei
+        try{
+          if(zeile.matches(regAusdruck2)){                                                      //Überprüft, ob die Kurseingabe korrekt ist
+            fw.write(zeile+"\r\n");                                                             //[I] Schreibt die Kurseingabe in die Datei ein
+          }
+          
+          else if(zeile.equals("@end")){                                                        //Beendet die Schleife, wenn "@end" eingegeben wird
+            fertig=!fertig;
+          }
+          
+          else{                                                                                 //Fehlerausgabe bei fehlerhafter Eingabe
+            System.out.println("Fehlerhafte Eingabe");
+          }
         }
-        
-        else if(zeile.equals("@end")){//Beendet die Datei wenn @end eingegeben wird
-          fertig=!fertig;
-        }
-        
-        else{//Gibt eine Fehlermeldung aus wenn die Eingabe ungültig ist
-          System.out.println("Fehlerhafte Eingabe");
-        }
+        catch(Exception e){}
       }
       
-      
-      //Datei wird geschlossen
-      System.out.println("--Ende-- Datei wird geschlossen: "+fileName);
+      System.out.println("--Datei "+fileName+" wird geschlossen--");                           //[I] Textdatei wird geschlossen
       fw.close();
     }
-    catch (IOException e){//Fehlermeldung wenn z.B. die Datei nicht existiert etc.
+    
+    catch (IOException e){                                                                    //[I] Fehlerausgabe, wenn z.B. die Textdatei nicht existiert
       System.out.println("Fehler beim Schreiben der Datei " + fileName);
       System.out.println(e.toString());
     }
